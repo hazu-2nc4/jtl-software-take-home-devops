@@ -1,0 +1,42 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JtlDemo.Abstractions", "..\shared\JtlDemo.Abstractions\JtlDemo.Abstractions.csproj", "{C71C8B6A-A004-48AE-8342-6F0AA72F30A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JtlDemo.Rest.Server", "src\JtlDemo.Rest.Server\JtlDemo.Rest.Server.csproj", "{ED82367F-D891-45B9-B9CF-4B2BF3EF3E14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JtlDemo.Rest.Linux.Host", "src\JtlDemo.Rest.Linux.Host\JtlDemo.Rest.Linux.Host.csproj", "{3A47277F-466E-4BFB-A9BD-D75EA5D8A846}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JtlDemo.Container.Healthcheck", "src\JtlDemo.Container.Healthcheck\JtlDemo.Container.Healthcheck.csproj", "{7555828D-24CB-4CBB-AC2A-E3B2E6B111C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JtlDemo.Linux.CompositionTests", "tests\JtlDemo.Linux.CompositionTests\JtlDemo.Linux.CompositionTests.csproj", "{1EFD64B1-ECF5-427C-8BE6-0D1C34C6A325}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C71C8B6A-A004-48AE-8342-6F0AA72F30A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C71C8B6A-A004-48AE-8342-6F0AA72F30A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C71C8B6A-A004-48AE-8342-6F0AA72F30A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C71C8B6A-A004-48AE-8342-6F0AA72F30A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED82367F-D891-45B9-B9CF-4B2BF3EF3E14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED82367F-D891-45B9-B9CF-4B2BF3EF3E14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED82367F-D891-45B9-B9CF-4B2BF3EF3E14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED82367F-D891-45B9-B9CF-4B2BF3EF3E14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A47277F-466E-4BFB-A9BD-D75EA5D8A846}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A47277F-466E-4BFB-A9BD-D75EA5D8A846}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A47277F-466E-4BFB-A9BD-D75EA5D8A846}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A47277F-466E-4BFB-A9BD-D75EA5D8A846}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7555828D-24CB-4CBB-AC2A-E3B2E6B111C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7555828D-24CB-4CBB-AC2A-E3B2E6B111C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7555828D-24CB-4CBB-AC2A-E3B2E6B111C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7555828D-24CB-4CBB-AC2A-E3B2E6B111C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EFD64B1-ECF5-427C-8BE6-0D1C34C6A325}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EFD64B1-ECF5-427C-8BE6-0D1C34C6A325}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EFD64B1-ECF5-427C-8BE6-0D1C34C6A325}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EFD64B1-ECF5-427C-8BE6-0D1C34C6A325}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

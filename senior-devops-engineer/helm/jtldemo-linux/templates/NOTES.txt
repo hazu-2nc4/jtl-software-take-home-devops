@@ -1,0 +1,12 @@
+The {{ include "jtldemo-linux.fullname" . }} service is installed.
+
+{{- if .Values.ingress.enabled }}
+Ingress is enabled. Ensure the selected ingress controller is configured by the
+platform team and exposes itself through the intended Azure Load Balancer.
+{{- else }}
+For local validation, run:
+  kubectl --namespace {{ .Release.Namespace }} port-forward service/{{ include "jtldemo-linux.fullname" . }} 8080:{{ .Values.service.port }}
+
+Then request:
+  http://127.0.0.1:8080/healthz
+{{- end }}

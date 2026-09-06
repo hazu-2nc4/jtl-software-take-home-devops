@@ -14,3 +14,8 @@
 - `research`
 - Cached plugin skills: `deep-research`, `plugin-management`
 - Cached artifact-template skills: 20 report/dashboard/memo/project templates
+
+## Agent Configuration
+
+- Model: ChatGPT 5.6 Terra - Light / Medium / High reasoning mode
+-

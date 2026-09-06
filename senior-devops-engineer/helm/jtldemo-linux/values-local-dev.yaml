@@ -1,0 +1,23 @@
+deploymentMode: local-dev
+
+image:
+  repository: jtldemo-linux
+  tag: local
+  pullPolicy: IfNotPresent
+
+config:
+  source: literal
+  literalConnectionString: Server=local-dev
+
+serviceAccount:
+  create: false
+  automountServiceAccountToken: false
+
+ingress:
+  enabled: false
+
+autoscaling:
+  enabled: false
+
+keyVault:
+  enabled: false

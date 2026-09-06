@@ -1,0 +1,50 @@
+# Azure production skeleton. Replace every REPLACE_ME value through a protected
+# delivery system; never put a production connection string in this file.
+deploymentMode: production
+
+replicaCount: 2
+
+image:
+  repository: REPLACE_ME.azurecr.io/jtldemo-linux
+  tag: REPLACE_ME_IMMUTABLE_TAG
+  pullPolicy: IfNotPresent
+
+config:
+  source: existingSecret
+  existingSecret:
+    # The CSI driver syncs this secret after mounting the SecretProviderClass.
+    name: jtldemo-linux-config
+    key: ConnectionStrings__JtlDemo
+
+serviceAccount:
+  create: true
+  automountServiceAccountToken: true
+
+# This is an application Ingress. Its platform-managed controller must expose
+# itself with an Azure Load Balancer; the application Service remains ClusterIP.
+ingress:
+  enabled: true
+  className: nginx
+  annotations: {}
+  hosts:
+    - host: REPLACE_ME.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+keyVault:
+  enabled: true
+  name: REPLACE_ME_KEY_VAULT_NAME
+  tenantId: REPLACE_ME_TENANT_ID
+  clientId: REPLACE_ME_USER_ASSIGNED_MANAGED_IDENTITY_CLIENT_ID
+  objectName: REPLACE_ME_KEY_VAULT_SECRET_NAME
+
+nodeSelector:
+  kubernetes.io/os: linux

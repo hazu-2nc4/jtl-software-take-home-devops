@@ -31,3 +31,10 @@ Do what you can well and note what you would do next. A clean slice and a runnin
   * **Observability** : what telemetry, metrics, and alerting you would add, and why.
   * **The exclusion list** : what you left out of the Linux image and how you would serve those Windows-only capabilities in a cloud world.
 * An **`ai-journey/` folder** documenting how you used AI: the plan you worked from, your key prompts, the tools/models/skills/MCP servers you used, and where you overrode the output.
+
+AI Agent Goal set
+
+- Make the service run without Windows. Cut the Windows coupling so it builds and runs on Linux. That means the registry-based configuration and the Windows Event Log logging have to go, and the Windows-only modules have to be separated from the rest. Which module stays and which does not . The Windows build has to stay functional: keep the excluded modules working on Windows, do not delete them.
+- Package it as a Linux container that starts and serves the kept endpoints, with a working health check.
+- Container hygiene. Multi-stage build, small image, non-root, pinned base, a working healthcheck
+- Keep the provided tests green

@@ -1,0 +1,115 @@
+{{- if not (has .Values.deploymentMode (list "local-dev" "production")) }}
+{{- fail "deploymentMode must be local-dev or production" }}
+{{- end }}
+{{- if eq .Values.deploymentMode "production" }}
+{{- if ne .Values.config.source "existingSecret" }}
+{{- fail "production requires config.source=existingSecret" }}
+{{- end }}
+{{- if not .Values.keyVault.enabled }}
+{{- fail "production requires keyVault.enabled=true" }}
+{{- end }}
+{{- if not .Values.ingress.enabled }}
+{{- fail "production requires ingress.enabled=true" }}
+{{- end }}
+{{- if not .Values.autoscaling.enabled }}
+{{- fail "production requires autoscaling.enabled=true" }}
+{{- end }}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "jtldemo-linux.fullname" . }}
+  labels:
+    {{- include "jtldemo-linux.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "jtldemo-linux.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "jtldemo-linux.selectorLabels" . | nindent 8 }}
+        {{- if .Values.keyVault.enabled }}
+        azure.workload.identity/use: "true"
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "jtldemo-linux.serviceAccountName" . }}
+      automountServiceAccountToken: {{ .Values.serviceAccount.automountServiceAccountToken }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: api
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: ConnectionStrings__JtlDemo
+              {{- if eq .Values.config.source "literal" }}
+              value: {{ required "config.literalConnectionString is required for local-dev" .Values.config.literalConnectionString | quote }}
+              {{- else if eq .Values.config.source "existingSecret" }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ required "config.existingSecret.name is required for existingSecret" .Values.config.existingSecret.name }}
+                  key: {{ required "config.existingSecret.key is required for existingSecret" .Values.config.existingSecret.key }}
+              {{- else }}
+              {{- fail "config.source must be literal or existingSecret" }}
+              {{- end }}
+          {{- if .Values.keyVault.enabled }}
+          volumeMounts:
+            - name: secrets-store
+              mountPath: /mnt/secrets-store
+              readOnly: true
+          {{- end }}
+          startupProbe:
+            httpGet:
+              path: {{ .Values.probes.startup.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.startup.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.liveness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.readiness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.keyVault.enabled }}
+      volumes:
+        - name: secrets-store
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: {{ include "jtldemo-linux.secretProviderClassName" . }}
+      {{- end }}

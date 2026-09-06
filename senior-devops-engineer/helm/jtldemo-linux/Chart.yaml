@@ -1,0 +1,6 @@
+apiVersion: v2
+name: jtldemo-linux
+description: Linux API slice for Items, Customers, and Stats.
+type: application
+version: 0.1.0
+appVersion: "8.0.30"
