@@ -2,6 +2,9 @@
 {{- fail "deploymentMode must be local-dev or production" }}
 {{- end }}
 {{- if eq .Values.deploymentMode "production" }}
+{{- if contains "REPLACE_ME" (toJson .Values) }}
+{{- fail "production values must replace every REPLACE_ME placeholder" }}
+{{- end }}
 {{- if ne .Values.config.source "existingSecret" }}
 {{- fail "production requires config.source=existingSecret" }}
 {{- end }}
@@ -15,6 +18,9 @@
 {{- fail "production requires autoscaling.enabled=true" }}
 {{- end }}
 {{- end }}
+{{- if gt (int .Values.autoscaling.minReplicas) (int .Values.autoscaling.maxReplicas) }}
+{{- fail "autoscaling.minReplicas must not exceed autoscaling.maxReplicas" }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -22,7 +28,9 @@ metadata:
   labels:
     {{- include "jtldemo-linux.labels" . | nindent 4 }}
 spec:
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
   selector:
     matchLabels:
       {{- include "jtldemo-linux.selectorLabels" . | nindent 6 }}
@@ -52,7 +60,7 @@ spec:
       {{- end }}
       containers:
         - name: api
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: {{ include "jtldemo-linux.image" . | quote }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
             {{- toYaml .Values.containerSecurityContext | nindent 12 }}

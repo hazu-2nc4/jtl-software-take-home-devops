@@ -120,3 +120,34 @@
 
 **Outcome:** The future policy is explicit: Flux image automation updates development only; QAT and production keep pinned chart/image versions and promote the identical immutable digest after prior-environment validation.
 
+## 15 - Independently evaluate the refactor decisions
+
+**Instruction:** Review `ai-journey/refactoring-notes.md` from another perspective, evaluate the refactor decisions, and suggest corrections or improvements.
+
+**Commands / actions:** Read the journaling and codebase-design skills, current journals, task requirements, application source/tests, Dockerfile, Helm chart, and deliverables. Re-ran both new solution tests with `--configuration Release --no-restore`; ran Helm lint/template against local-dev. Verified a proposed helper-definition correction in a temporary chart copy and inspected production rendering there. Checked official Docker, Kubernetes, Helm, and Microsoft documentation for operational claims. Added `ai-journey/refactoring-review.md` and updated the next steps.
+
+**Outcome:** Endorsed the scoped Linux split while prioritizing a confirmed Helm parse failure, unreliable image/rollback instructions, missing HTTP-level Windows evidence, blank-configuration validation, and the incomplete deliverable README. Linux tests passed 2/2 and Windows tests 1/1 with NU1900 warnings. The temporary helper correction passes local lint and renders both modes under Helm 4.1.4, but production placeholders are accepted. Flagged the printer discovery-to-job-worker assumption and documented printing API support constraints. Product source and repository deployment files were not changed during this review. The user subsequently accepted the corrections; implementation and final scope are recorded below.
+
+## 16 - Apply the accepted refactor corrections
+
+**Instruction:** Apply the reviewed corrections, rerun the installed Helm linter, refresh package restore metadata, and stop repeating the earlier package-source diagnosis.
+
+**Commands / actions:** Corrected Helm helper definitions, HPA replica ownership, image digest rendering, production input schema/guards, and Linux AMD64 scheduling. Pinned both base-image digests. Tightened both hosts' configuration validation and added a focused API smoke script. Updated the user's README draft while retaining its Windows hosting trade-offs; corrected runbook image identities, rollback selection, Helm 3/4 failure flags, and current refactoring notes. Ran fresh audited restores through the machine network, both solution tests, API smoke checks, Docker build/run verification, and direct Helm lint.
+
+**Outcome:** Local-dev Helm lint passes with Helm 4.1.4. Linux tests pass 2/2 and Windows tests 1/1; both hosts pass missing/empty/whitespace rejection and retained/excluded HTTP route checks, including a decodable Windows PNG and printer-array response. The rebuilt image is healthy, runs as UID 1654, and serves all five Linux routes. Fresh audited restores succeed without suppression. Kind deployment/rollback and Azure production remain future validation; no cloud resources were changed.
+
+## 17 - Keep Helm verification minimal
+
+**Instruction:** Remove the additional Helm template sanity tests; keep the task working without overengineering.
+
+**Commands / actions:** Removed the newly added Helm validation script and synthetic production fixture, removed their documentation references, and retained direct `helm lint` plus the ordinary runbook rendering command.
+
+**Outcome:** No Helm sanity-test suite remains. Direct local-dev lint passes; the focused API smoke script remains to establish the required Linux/Windows behavior.
+
+## 18 - Attempt local-dev Kind deployment
+
+**Instruction:** Test the implemented Helm local-dev deployment after installing a Kind cluster; then update the RUNBOOK to make image loading into the running Kind cluster explicit, without adding a separate journal recap.
+
+**Commands / actions:** Read the refactoring notes, local-dev chart values, chart runbook, and current journal. Confirmed Helm 4.1.4 lint passes with `values-local-dev.yaml` and rendered the expected Service and one-replica Deployment. Checked the active Kubernetes configuration, cluster reachability, nodes, and Docker API access before attempting installation. Revised `deliverables/RUNBOOK.md` to separate image build, Kind start/reuse, node-context verification, and post-start `kind load docker-image` steps.
+
+**Outcome:** Deployment could not start from this shell: `kubectl` has no current context and falls back to an unavailable `localhost:8080` API; Docker cannot access its named-pipe API. The runbook now explicitly loads the newly built tagged image after the `jtldemo` cluster starts (or is reused), and verifies the Kind context before Helm installation.

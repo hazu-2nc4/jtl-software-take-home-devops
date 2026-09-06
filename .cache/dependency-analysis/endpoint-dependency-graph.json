@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "analysis": {
+    "scope": "senior-devops-engineer/app",
+    "generated_at_utc": "2026-09-06T16:05:56.1769858Z",
+    "method": [
+      "Static traversal of handwritten C# and project files",
+      "Project/package resolution via dotnet list package --include-transitive",
+      "Build and test of the unmodified solution on Windows"
+    ],
+    "source_boundary": "Application source references are traced to public .NET API calls. Framework/native implementations are not decompiled.",
+    "source_files": [
+      { "path": "src/JtlDemo.Abstractions/IApiModule.cs", "sha256": "635281ead7aca701f50ea623cbc712a14b77a1cdda9f6975542dc5a99bc46303" },
+      { "path": "src/JtlDemo.Abstractions/JtlDemo.Abstractions.csproj", "sha256": "388fffd691252fe7c8fc4e6465349867c62808c8d04698e2dcab035493da0487" },
+      { "path": "src/JtlDemo.Modules.Windows/DocumentExportModule.cs", "sha256": "c16bbf47f7b011a2a5895af972568ad7794eea90ff4966c9bb79dd0da01abc2e" },
+      { "path": "src/JtlDemo.Modules.Windows/JtlDemo.Modules.Windows.csproj", "sha256": "4e6574e6192aa810d3ab69c3f759782e3f0ec7b24e28c022dc7c0e0c2684b8e0" },
+      { "path": "src/JtlDemo.Modules.Windows/PrinterModule.cs", "sha256": "f0eda92862a0ea53ca6b9195285cbb6bf7d24f8edee856b64ba9871d0cb8715c" },
+      { "path": "src/JtlDemo.Modules.Windows/StatsModule.cs", "sha256": "612f85adf8450cfda821b7ad7ac743fdf66ce309dd572818149150a1c39b9097" },
+      { "path": "src/JtlDemo.Rest.Host/JtlDemo.Rest.Host.csproj", "sha256": "13b10cd08cadba9942e9463eceb99e1e74e325c6e28a2720680d6759b8a6bd5a" },
+      { "path": "src/JtlDemo.Rest.Host/Program.cs", "sha256": "8c0f734c9ef10c2b1cf1451a72507ca563ae9beb2b12b5d96ffa3f9b2603f51a" },
+      { "path": "src/JtlDemo.Rest.Server/ApiModuleCatalog.cs", "sha256": "109ae1438df323a20b0b8b40380c4ccc9f77b7c0551207203806c147873fec09" },
+      { "path": "src/JtlDemo.Rest.Server/CustomersModule.cs", "sha256": "63743081cfbd9319540797884e67fa5c66327c88b352c5c90dd61cbd1d88a7ff" },
+      { "path": "src/JtlDemo.Rest.Server/ItemsModule.cs", "sha256": "ac86343d0b3823f6aba937801828d206ba4bb69e952e5e6af73418d5a1f5866c" },
+      { "path": "src/JtlDemo.Rest.Server/JtlDemo.Rest.Server.csproj", "sha256": "243ff47312cfb515f62bd8a65725d9182ad19794d38e8c9e1c02c9cb36c9624c" },
+      { "path": "tests/JtlDemo.CompositionTests/CompositionTests.cs", "sha256": "f03d824887aa943ff5098a063e3c09998bd8fec6120a0cd583ef656e98eac415" },
+      { "path": "tests/JtlDemo.CompositionTests/JtlDemo.CompositionTests.csproj", "sha256": "031d18ee556d7b7c94649cebb5942aa9b6f6cb845ede4b376b8adff53201703d" },
+      { "path": "JtlDemo.sln", "sha256": "c4ce21571152f90d5a3e73cf26ce02dd81106306c9e77fbd7f78dc04aaaca527" }
+    ]
+  },
+  "project_graph": {
+    "nodes": [
+      { "id": "abstractions", "project": "JtlDemo.Abstractions", "target_framework": "net8.0", "windows_api_use": "none" },
+      { "id": "windows_modules", "project": "JtlDemo.Modules.Windows", "target_framework": "net8.0-windows", "windows_api_use": "DocumentExportModule and PrinterModule" },
+      { "id": "rest_server", "project": "JtlDemo.Rest.Server", "target_framework": "net8.0-windows", "windows_api_use": "none directly; Windows target inherited through direct project reference" },
+      { "id": "host", "project": "JtlDemo.Rest.Host", "target_framework": "net8.0-windows", "windows_api_use": "Registry and EventLog at startup" },
+      { "id": "composition_tests", "project": "JtlDemo.CompositionTests", "target_framework": "net8.0-windows", "windows_api_use": "none directly; references Windows assembly" }
+    ],
+    "edges": [
+      { "from": "windows_modules", "to": "abstractions", "kind": "ProjectReference" },
+      { "from": "rest_server", "to": "abstractions", "kind": "ProjectReference" },
+      { "from": "rest_server", "to": "windows_modules", "kind": "ProjectReference", "source": "ApiModuleCatalog constructs all modules" },
+      { "from": "host", "to": "rest_server", "kind": "ProjectReference" },
+      { "from": "composition_tests", "to": "rest_server", "kind": "ProjectReference" },
+      { "from": "composition_tests", "to": "windows_modules", "kind": "ProjectReference" }
+    ],
+    "package_edges": [
+      { "project": "windows_modules", "package": "System.Drawing.Common", "version": "8.0.10", "direct": true },
+      { "project": "windows_modules", "package": "Microsoft.Win32.SystemEvents", "version": "8.0.0", "direct": false },
+      { "project": "host", "package": "Microsoft.Win32.Registry", "version": "5.0.0", "direct": true },
+      { "project": "host", "package": "System.Diagnostics.EventLog", "version": "8.0.1", "direct": true },
+      { "project": "host", "package": "System.Security.AccessControl", "version": "5.0.0", "direct": false },
+      { "project": "host", "package": "System.Security.Principal.Windows", "version": "5.0.0", "direct": false }
+    ]
+  },
+  "startup_path": {
+    "entrypoint": "JtlDemo.Rest.Host/Program.cs",
+    "chain": [
+      "WebApplication.CreateBuilder(args)",
+      "builder.Build()",
+      "Registry.LocalMachine.OpenSubKey(\"SOFTWARE\\JTL\\Wawi\")",
+      "RegistryKey.GetValue(\"ConnectionString\") or InvalidOperationException",
+      "EventLog.WriteEntry(\"Application\", ..., EventLogEntryType.Information)",
+      "Map /healthz and /api/_config",
+      "ApiModuleCatalog.BuildApiModules()",
+      "IApiModule.MapEndpoints(app) for every catalog module",
+      "app.Run()"
+    ],
+    "linux_effect": "Registry and EventLog execute before app.Run(); therefore the current host can fail before binding a port and every endpoint is unavailable."
+  },
+  "endpoints": [
+    {
+      "method": "GET", "route": "/healthz", "registration": "Program.cs:17", "dependency_chain": ["Program top-level startup", "app.MapGet", "handler", "Results.Ok", "anonymous { status = \"ok\" }"], "application_objects": [], "direct_windows_dependency_ids": [], "inherited_startup_dependency_ids": ["WIN-001", "WIN-002"], "linux_disposition": "keep", "blast_radius": "Route logic is portable, but it is unreachable while either startup blocker remains."
+    },
+    {
+      "method": "GET", "route": "/api/_config", "registration": "Program.cs:18", "dependency_chain": ["Program top-level startup", "connectionString from WIN-001", "app.MapGet", "handler", "connectionString.Length", "Results.Ok", "anonymous { configured = ... }"], "application_objects": [], "direct_windows_dependency_ids": ["WIN-001"], "inherited_startup_dependency_ids": ["WIN-002"], "linux_disposition": "keep after replacing configuration provider", "blast_radius": "The endpoint's only business input is registry-derived; its meaning must be preserved when moving to environment/config-provider input."
+    },
+    {
+      "method": "GET", "route": "/api/items", "registration": "ItemsModule.cs:21", "dependency_chain": ["Program foreach catalog module", "ApiModuleCatalog.BuildApiModules", "new ItemsModule", "IApiModule.MapEndpoints", "endpoints.MapGet", "handler", "ItemsModule.Items", "Item record", "Results.Ok"], "application_objects": ["ItemsModule", "IApiModule", "Item"], "direct_windows_dependency_ids": [], "inherited_startup_dependency_ids": ["WIN-001", "WIN-002", "WIN-003"], "linux_disposition": "keep", "blast_radius": "No code-level OS call; blocked only by host startup and the catalog's Windows assembly edge."
+    },
+    {
+      "method": "GET", "route": "/api/customers", "registration": "CustomersModule.cs:20", "dependency_chain": ["Program foreach catalog module", "ApiModuleCatalog.BuildApiModules", "new CustomersModule", "IApiModule.MapEndpoints", "endpoints.MapGet", "handler", "CustomersModule.Customers", "Customer record", "Results.Ok"], "application_objects": ["CustomersModule", "IApiModule", "Customer"], "direct_windows_dependency_ids": [], "inherited_startup_dependency_ids": ["WIN-001", "WIN-002", "WIN-003"], "linux_disposition": "keep", "blast_radius": "No code-level OS call; blocked only by host startup and the catalog's Windows assembly edge."
+    },
+    {
+      "method": "GET", "route": "/api/stats", "registration": "StatsModule.cs:19", "dependency_chain": ["Program foreach catalog module", "ApiModuleCatalog.BuildApiModules", "new StatsModule", "IApiModule.MapEndpoints", "endpoints.MapGet", "handler", "StatsModule.Value", "Results.Ok", "anonymous { value = 42 }"], "application_objects": ["StatsModule", "IApiModule"], "direct_windows_dependency_ids": [], "inherited_startup_dependency_ids": ["WIN-001", "WIN-002", "WIN-003"], "linux_disposition": "keep; move from Windows assembly", "blast_radius": "The handler is portable, but its current assembly placement makes it collateral damage of the catalog coupling."
+    },
+    {
+      "method": "GET", "route": "/api/documents/{id}/preview", "registration": "DocumentExportModule.cs:19", "dependency_chain": ["Program foreach catalog module", "ApiModuleCatalog.BuildApiModules", "new DocumentExportModule", "IApiModule.MapEndpoints", "endpoints.MapGet", "handler(int id)", "new Bitmap(240, 60)", "Graphics.FromImage(bitmap)", "Graphics.Clear(Color.White)", "Graphics.DrawString(..., SystemFonts.DefaultFont, Brushes.Black, ...)", "new MemoryStream", "Bitmap.Save(stream, ImageFormat.Png)", "Results.File"], "application_objects": ["DocumentExportModule", "IApiModule"], "direct_windows_dependency_ids": ["WIN-004"], "inherited_startup_dependency_ids": ["WIN-001", "WIN-002", "WIN-003"], "linux_disposition": "exclude from Linux image; retain as Windows supplement", "blast_radius": "Loss of preview generation for Linux-hosted callers unless routed to a Windows worker/service or replaced with a cross-platform rendering implementation."
+    },
+    {
+      "method": "GET", "route": "/api/printers", "registration": "PrinterModule.cs:18", "dependency_chain": ["Program foreach catalog module", "ApiModuleCatalog.BuildApiModules", "new PrinterModule", "IApiModule.MapEndpoints", "endpoints.MapGet", "handler", "PrinterSettings.InstalledPrinters", "Enumerable.Cast<string>", "Enumerable.ToArray", "Results.Ok"], "application_objects": ["PrinterModule", "IApiModule"], "direct_windows_dependency_ids": ["WIN-005"], "inherited_startup_dependency_ids": ["WIN-001", "WIN-002", "WIN-003"], "linux_disposition": "exclude from Linux image; retain as Windows supplement", "blast_radius": "Linux containers have no meaningful host-printer inventory; callers need a Windows print service or a redesigned, explicitly configured printer capability."
+    }
+  ],
+  "windows_dependencies": [
+    { "id": "WIN-001", "severity": "blocker", "source": "src/JtlDemo.Rest.Host/Program.cs:10-12", "chain": ["Microsoft.Win32.Registry package 5.0.0", "Registry.LocalMachine", "RegistryKey.OpenSubKey(\"SOFTWARE\\JTL\\Wawi\")", "RegistryKey.GetValue(\"ConnectionString\")", "InvalidOperationException if missing"], "execution": "host startup before routes are mapped", "blast_radius": "All 7 endpoints and container readiness", "migration_action": "Use IConfiguration with environment variables or mounted configuration; inject the connection string rather than reading HKLM." },
+    { "id": "WIN-002", "severity": "blocker", "source": "src/JtlDemo.Rest.Host/Program.cs:15", "chain": ["System.Diagnostics.EventLog package 8.0.1", "EventLog.WriteEntry", "EventLogEntryType.Information"], "execution": "host startup before routes are mapped", "blast_radius": "All 7 endpoints and container readiness", "migration_action": "Use the standard ILogger pipeline and emit structured logs to stdout/stderr for container collection." },
+    { "id": "WIN-003", "severity": "build-and-composition blocker", "source": "src/JtlDemo.Rest.Server/ApiModuleCatalog.cs:2,11-17; src/JtlDemo.Rest.Server/JtlDemo.Rest.Server.csproj:9,20", "chain": ["Rest.Server ProjectReference", "JtlDemo.Modules.Windows assembly", "ApiModuleCatalog directly constructs StatsModule, DocumentExportModule, and PrinterModule", "Rest.Server targets net8.0-windows", "Host inherits Windows-only dependency"], "execution": "build/assembly loading and module registration", "blast_radius": "Prevents a clean Linux target for the host and entangles the 5 otherwise-keepable endpoints with the 2 excluded modules.", "migration_action": "Move StatsModule to the portable server assembly and compose Linux modules in the host; keep a separate Windows composition supplement for Documents and Printers." },
+    { "id": "WIN-004", "severity": "endpoint blocker", "source": "src/JtlDemo.Modules.Windows/DocumentExportModule.cs:1-28", "chain": ["System.Drawing.Common package 8.0.10", "Bitmap", "Graphics.FromImage", "Graphics.DrawString", "SystemFonts.DefaultFont", "Bitmap.Save(ImageFormat.Png)"], "execution": "only when GET /api/documents/{id}/preview is invoked", "blast_radius": "Document-preview capability only after correct composition separation; currently contributes to WIN-003.", "migration_action": "Do not include in the Linux image. Keep it in a Windows supplement or replace the rendering engine with a supported cross-platform implementation." },
+    { "id": "WIN-005", "severity": "endpoint blocker", "source": "src/JtlDemo.Modules.Windows/PrinterModule.cs:1-21", "chain": ["System.Drawing.Printing", "PrinterSettings.InstalledPrinters", "Enumerable.Cast<string>", "Enumerable.ToArray"], "execution": "only when GET /api/printers is invoked", "blast_radius": "Printer-discovery capability only after correct composition separation; currently contributes to WIN-003.", "migration_action": "Do not include in the Linux image. Retain a Windows print service/supplement or redefine the capability around explicitly managed printers." }
+  ],
+  "negative_findings": [
+    "No P/Invoke, DllImport, COM interop, native DLL names, drive-root paths, or additional Windows API namespaces were found in handwritten application source outside the five findings above.",
+    "StatsModule has no direct Windows API call; its Windows-only status is assembly placement, not functionality.",
+    "ItemsModule and CustomersModule have no direct Windows API call."
+  ],
+  "verification": {
+    "environment": "Windows 10.0.26200, .NET SDK 8.0.424",
+    "build": "dotnet build JtlDemo.sln --no-restore -v:minimal: passed, 0 warnings, 0 errors",
+    "tests": "dotnet test JtlDemo.sln --no-build --no-restore -v:minimal: passed, 2/2"
+  }
+}

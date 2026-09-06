@@ -1,0 +1,194 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JtlDemo Linux delivery values",
+  "type": "object",
+  "required": [
+    "deploymentMode",
+    "replicaCount",
+    "image",
+    "config",
+    "serviceAccount",
+    "service",
+    "ingress",
+    "autoscaling",
+    "keyVault",
+    "nodeSelector"
+  ],
+  "properties": {
+    "deploymentMode": {"enum":["local-dev","production"]},
+    "replicaCount": {"type":"integer","minimum":1},
+    "image": {
+      "type": "object",
+      "required": ["repository","tag","digest","pullPolicy"],
+      "properties": {
+        "repository": {"type":"string","pattern":"^[a-z0-9][a-z0-9./:_-]*$"},
+        "tag": {"type":"string"},
+        "digest": {"type":"string","pattern":"^(|sha256:[a-f0-9]{64})$"},
+        "pullPolicy": {"enum":["Always","IfNotPresent","Never"]}
+      }
+    },
+    "config": {
+      "type": "object",
+      "required": ["source","literalConnectionString","existingSecret"],
+      "properties": {
+        "source": {"enum":["literal","existingSecret"]},
+        "literalConnectionString": {"type":"string"},
+        "existingSecret": {"type":"object","required":["name","key"],"properties":{"name":{"type":"string"},"key":{"type":"string"}}}
+      }
+    },
+    "serviceAccount": {
+      "type": "object",
+      "required": ["create","name","automountServiceAccountToken","annotations"],
+      "properties": {
+        "create": {"type":"boolean"},
+        "name": {"type":"string"},
+        "automountServiceAccountToken": {"type":"boolean"},
+        "annotations": {"type":"object"}
+      }
+    },
+    "service": {
+      "type": "object",
+      "required": ["type","port"],
+      "properties": {"type":{"enum":["ClusterIP","NodePort","LoadBalancer"]},"port":{"type":"integer","minimum":1,"maximum":65535}}
+    },
+    "ingress": {
+      "type": "object",
+      "required": ["enabled","className","hosts","tls"],
+      "properties": {
+        "enabled": {"type":"boolean"},
+        "className": {"type":"string"},
+        "hosts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["host","paths"],
+            "properties": {
+              "host": {
+                "type": "string",
+                "maxLength": 253,
+                "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$"
+              },
+              "paths": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": ["path","pathType"],
+                  "properties": {
+                    "path": {"type":"string","pattern":"^/"},
+                    "pathType": {"enum":["Prefix","Exact","ImplementationSpecific"]}
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tls": {"type":"array"}
+      }
+    },
+    "autoscaling": {
+      "type": "object",
+      "required": ["enabled","minReplicas","maxReplicas","targetCPUUtilizationPercentage"],
+      "properties": {
+        "enabled": {"type":"boolean"},
+        "minReplicas": {"type":"integer","minimum":1},
+        "maxReplicas": {"type":"integer","minimum":1},
+        "targetCPUUtilizationPercentage": {"type":"integer","minimum":1}
+      }
+    },
+    "keyVault": {
+      "type": "object",
+      "required": ["enabled","name","tenantId","clientId","objectName"],
+      "properties": {
+        "enabled": {"type":"boolean"},
+        "name": {"type":"string"},
+        "tenantId": {"type":"string"},
+        "clientId": {"type":"string"},
+        "objectName": {"type":"string"}
+      }
+    },
+    "nodeSelector": {
+      "type": "object",
+      "required": ["kubernetes.io/os","kubernetes.io/arch"],
+      "properties": {"kubernetes.io/os":{"const":"linux"},"kubernetes.io/arch":{"const":"amd64"}}
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties":{"config":{"properties":{"source":{"const":"literal"}}}}},
+      "then": {"properties":{"config":{"properties":{"literalConnectionString":{"type":"string","pattern":"\\S"}}}}}
+    },
+    {
+      "if": {"properties":{"config":{"properties":{"source":{"const":"existingSecret"}}}}},
+      "then": {
+        "properties": {
+          "config": {
+            "properties": {
+              "existingSecret": {
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 253,
+                    "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$"
+                  },
+                  "key": {"type":"string","pattern":"^[A-Za-z0-9._-]+$"}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties":{"ingress":{"properties":{"enabled":{"const":true}}}}},
+      "then": {
+        "properties": {
+          "ingress": {
+            "properties": {
+              "className": {
+                "type": "string",
+                "maxLength": 253,
+                "pattern": "^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$"
+              },
+              "hosts": {"minItems":1}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties":{"keyVault":{"properties":{"enabled":{"const":true}}}}},
+      "then": {
+        "properties": {
+          "config": {"properties":{"source":{"const":"existingSecret"}}},
+          "keyVault": {
+            "properties": {
+              "name": {"type":"string","minLength":3,"maxLength":24,"pattern":"^[a-zA-Z][a-zA-Z0-9-]*[a-zA-Z0-9]$"},
+              "tenantId": {
+                "type": "string",
+                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+              },
+              "clientId": {
+                "type": "string",
+                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+              },
+              "objectName": {"type":"string","minLength":1,"pattern":"^[a-zA-Z0-9-]+$"}
+            }
+          }
+        }
+      }
+    },
+    {
+      "if": {"properties":{"deploymentMode":{"const":"production"}}},
+      "then": {
+        "properties": {
+          "image": {"properties":{"digest":{"type":"string","pattern":"^sha256:[a-f0-9]{64}$"}}},
+          "config": {"properties":{"source":{"const":"existingSecret"},"literalConnectionString":{"maxLength":0}}},
+          "ingress": {"properties":{"enabled":{"const":true}}},
+          "autoscaling": {"properties":{"enabled":{"const":true}}},
+          "keyVault": {"properties":{"enabled":{"const":true}}}
+        }
+      }
+    }
+  ]
+}

@@ -5,6 +5,8 @@ replicaCount: 1
 image:
   repository: jtldemo-linux
   tag: local
+  # When supplied, digest takes precedence over tag. Required in production.
+  digest: ""
   pullPolicy: IfNotPresent
 
 config:
@@ -47,7 +49,9 @@ keyVault:
   clientId: ""
   objectName: ""
 
-nodeSelector: {}
+nodeSelector:
+  kubernetes.io/os: linux
+  kubernetes.io/arch: amd64
 tolerations: []
 affinity: {}
 

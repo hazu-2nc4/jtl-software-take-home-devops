@@ -8,6 +8,7 @@
 {{- else }}
 {{- printf "%s-%s" .Release.Name (include "jtldemo-linux.name" .) | trunc 63 | trimSuffix "-" }}
 {{- end }}
+{{- end }}
 
 {{- define "jtldemo-linux.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
@@ -20,7 +21,14 @@
 {{- define "jtldemo-linux.secretProviderClassName" -}}
 {{- printf "%s-keyvault" (include "jtldemo-linux.fullname" .) | trunc 63 | trimSuffix "-" }}
 {{- end }}
-{{- end }}
+
+{{- define "jtldemo-linux.image" -}}
+{{- if .Values.image.digest -}}
+{{- printf "%s@%s" .Values.image.repository .Values.image.digest -}}
+{{- else -}}
+{{- printf "%s:%s" .Values.image.repository (required "image.tag is required without image.digest" .Values.image.tag) -}}
+{{- end -}}
+{{- end -}}
 
 {{- define "jtldemo-linux.labels" -}}
 app.kubernetes.io/name: {{ include "jtldemo-linux.name" . }}

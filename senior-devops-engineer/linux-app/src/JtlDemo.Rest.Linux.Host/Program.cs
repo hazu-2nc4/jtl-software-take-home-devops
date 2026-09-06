@@ -1,9 +1,12 @@
 using JtlDemo.Rest.Server;
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("JtlDemo")
-    ?? throw new InvalidOperationException(
+var connectionString = builder.Configuration.GetConnectionString("JtlDemo");
+if (string.IsNullOrWhiteSpace(connectionString))
+{
+    throw new InvalidOperationException(
         "Missing required configuration value ConnectionStrings__JtlDemo. Set it as an environment variable or configuration provider value.");
+}
 
 var app = builder.Build();
 

@@ -1,0 +1,35 @@
+digraph JtlDemoEndpointDependencies {
+  rankdir=LR;
+  graph [fontname="Segoe UI", labelloc="t", label="JtlDemo endpoint dependency graph - source snapshot 2026-09-06"];
+  node [fontname="Segoe UI", shape=box, style="rounded,filled", fillcolor="#eaf2f8"];
+  edge [fontname="Segoe UI"];
+
+  host [label="Program.cs host"];
+  startup [label="Registry + EventLog startup\nWIN-001, WIN-002", fillcolor="#f5b7b1"];
+  catalog [label="ApiModuleCatalog.BuildApiModules\nWIN-003", fillcolor="#f5b7b1"];
+  contract [label="IApiModule.MapEndpoints"];
+
+  health [label="GET /healthz\nResults.Ok(status)"];
+  config [label="GET /api/_config\nconnectionString.Length"];
+  items [label="GET /api/items\nItemsModule -> Item -> Results.Ok"];
+  customers [label="GET /api/customers\nCustomersModule -> Customer -> Results.Ok"];
+  stats [label="GET /api/stats\nStatsModule.Value -> Results.Ok"];
+  documents [label="GET /api/documents/{id}/preview\nDocumentExportModule", fillcolor="#f5b7b1"];
+  printers [label="GET /api/printers\nPrinterModule", fillcolor="#f5b7b1"];
+  gdi [label="Bitmap -> Graphics -> SystemFonts\n-> Bitmap.Save(ImageFormat.Png)\nWIN-004", fillcolor="#f1948a"];
+  printing [label="PrinterSettings.InstalledPrinters\n-> Cast -> ToArray\nWIN-005", fillcolor="#f1948a"];
+
+  host -> startup [label="before port bind"];
+  host -> health;
+  host -> config;
+  host -> catalog;
+  catalog -> contract;
+  contract -> items;
+  contract -> customers;
+  contract -> stats;
+  contract -> documents;
+  contract -> printers;
+  config -> startup [label="registry value", color="#c0392b"];
+  documents -> gdi [color="#c0392b"];
+  printers -> printing [color="#c0392b"];
+}

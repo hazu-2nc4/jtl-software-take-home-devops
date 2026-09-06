@@ -2,11 +2,10 @@
 # delivery system; never put a production connection string in this file.
 deploymentMode: production
 
-replicaCount: 2
-
 image:
   repository: REPLACE_ME.azurecr.io/jtldemo-linux
-  tag: REPLACE_ME_IMMUTABLE_TAG
+  tag: ""
+  digest: REPLACE_ME_SHA256_DIGEST
   pullPolicy: IfNotPresent
 
 config:
@@ -48,3 +47,4 @@ keyVault:
 
 nodeSelector:
   kubernetes.io/os: linux
+  kubernetes.io/arch: amd64
